@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -20,7 +21,7 @@ import com.google.firebase.database.FirebaseDatabase
 class HomeFragment : Fragment() {
     private lateinit var mBinding: FragmentHomeBinding
     private lateinit var mFirebaseRecyclerAdapter: FirebaseRecyclerAdapter<Snapshot, SnapshotHolder>
-
+    private lateinit var mLayoutManager: RecyclerView.LayoutManager
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -53,11 +54,12 @@ class HomeFragment : Fragment() {
                     model: Snapshot
                 ) {
                     val snapshot = getItem(position)
-                    with(holder){
+                    with(holder) {
                         setListener(snapshot)
                         binding.tvTitle.text = snapshot.title
                         Glide.with(mContext).load(snapshot.photoUrl).centerCrop().diskCacheStrategy(
-                            DiskCacheStrategy.ALL).into(binding.imgPhoto)
+                            DiskCacheStrategy.ALL
+                        ).into(binding.imgPhoto)
                     }
                 }
 
@@ -71,7 +73,22 @@ class HomeFragment : Fragment() {
                     Toast.makeText(mContext, error.message, Toast.LENGTH_SHORT).show()
                 }
             }
+        mLayoutManager = LinearLayoutManager(context)
+        mBinding.recyclerView.apply {
+            setHasFixedSize(true)
+            layoutManager = mLayoutManager
+            adapter = mFirebaseRecyclerAdapter
+        }
+    }
 
+    override fun onStart() {
+        super.onStart()
+        mFirebaseRecyclerAdapter.startListening()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mFirebaseRecyclerAdapter.stopListening()
     }
 
     inner class SnapshotHolder(view: View) : RecyclerView.ViewHolder(view) {
