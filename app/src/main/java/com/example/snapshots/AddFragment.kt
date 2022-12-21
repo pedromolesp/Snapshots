@@ -10,10 +10,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.snapshots.databinding.FragmentAddBinding
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 
 class AddFragment : Fragment() {
     private val RC_GALLERY = 18
+    private val PATH_SNAPSHOTS = "snapshots"
+
     private lateinit var mBinding: FragmentAddBinding
+    private lateinit var mStorageReferece: StorageReference
+    private lateinit var mDatabaseReference: DatabaseReference
     private var mPhotoSelectUri: Uri? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,6 +41,9 @@ class AddFragment : Fragment() {
         mBinding.btnSelect.setOnClickListener {
             openGallery()
         }
+        mStorageReferece = FirebaseStorage.getInstance()
+            .reference
+        mDatabaseReference = FirebaseDatabase.getInstance().reference.child(PATH_SNAPSHOTS)
     }
 
     private fun openGallery() {
@@ -43,12 +54,19 @@ class AddFragment : Fragment() {
     private fun postSnapshot() {
     }
 
+    private fun saveSnapshot() {
+
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == RC_GALLERY) {
                 mPhotoSelectUri = data?.data
                 mBinding.imgPhoto.setImageURI(mPhotoSelectUri)
+                mBinding.tilTitle.visibility = View.VISIBLE
+                mBinding.btnSelect.visibility = View.INVISIBLE
+                mBinding.tvMessage.text = getString(R.string.post_message_valid_title)
             }
         }
     }
