@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.snapshots.databinding.FragmentAddBinding
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
@@ -52,6 +53,28 @@ class AddFragment : Fragment() {
     }
 
     private fun postSnapshot() {
+        mBinding.progressBar.visibility = View.VISIBLE
+//        mStorageReferece.child(PATH_SNAPSHOTS).child("my_photo")
+        val storage = mStorageReferece.child(PATH_SNAPSHOTS).child("my_photo")
+        if (mPhotoSelectUri != null)
+            storage.putFile(mPhotoSelectUri!!).addOnProgressListener {
+                val progress = (100 * it.bytesTransferred / it.totalByteCount).toDouble()
+                mBinding.progressBar.progress = progress.toInt()
+                mBinding.tvMessage.text = "$progress"
+            }
+                .addOnCompleteListener {
+                    mBinding.progressBar.visibility = View.INVISIBLE
+                }.addOnSuccessListener {
+                    Snackbar.make(
+                        mBinding.root, "Instantánea publicada",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }.addOnFailureListener {
+                    Snackbar.make(
+                        mBinding.root, "Instantánea publicada",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
     }
 
     private fun saveSnapshot() {
