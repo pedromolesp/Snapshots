@@ -1,11 +1,14 @@
 package com.example.snapshots
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.example.snapshots.databinding.ActivityMainBinding
 import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 import java.util.*
 
@@ -15,7 +18,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mActiveFragment: Fragment
     private lateinit var mFragmentManager: FragmentManager
     private lateinit var mAuthListener: FirebaseAuth.AuthStateListener
-    private var mFirebaseAuth:FirebaseAuth? = null
+    private var mFirebaseAuth: FirebaseAuth? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mBinding = ActivityMainBinding.inflate(layoutInflater)
@@ -28,14 +31,15 @@ class MainActivity : AppCompatActivity() {
         mFirebaseAuth = FirebaseAuth.getInstance()
         mAuthListener = FirebaseAuth.AuthStateListener {
             val user = it.currentUser
-            if(user == null){
-                startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder().setAvailableProviders(
-                    Arrays.asList(
-                        AuthUI.IdpConfig.EmailBuilder().build(),
-                        AuthUI.IdpConfig.GoogleBuilder().build()
-
+            if (user == null) {
+                startActivityForResult(
+                    AuthUI.getInstance().createSignInIntentBuilder().setAvailableProviders(
+                        Arrays.asList(
+                            AuthUI.IdpConfig.EmailBuilder().build(),
+                            AuthUI.IdpConfig.GoogleBuilder().build()
+                        )
                     )
-                ).build(),
+                        .build(),
                     RC_SIGN_IN
                 )
             }
@@ -50,6 +54,19 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         mFirebaseAuth?.removeAuthStateListener(mAuthListener)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == RC_SIGN_IN) {
+            if (resultCode == RESULT_OK) {
+                Toast.makeText(this, "Bienvenido", Toast.LENGTH_SHORT).show()
+            } else {
+                if (IdpResponse.fromResultIntent(data) == null) {
+                    finish()
+                }
+            }
+        }
     }
 
     private fun setupBottomNav() {
