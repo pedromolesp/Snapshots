@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.snapshots.databinding.FragmentAddBinding
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
@@ -55,7 +56,7 @@ class AddFragment : Fragment() {
     private fun postSnapshot() {
         mBinding.progressBar.visibility = View.VISIBLE
         val key = mDatabaseReference.push().key!!
-        val storage = mStorageReferece.child(PATH_SNAPSHOTS).child("my_photo")
+        val storage = mStorageReferece.child(PATH_SNAPSHOTS).child(FirebaseAuth.getInstance().currentUser!!.uid).child(key)
         if (mPhotoSelectUri != null)
             storage.putFile(mPhotoSelectUri!!).addOnProgressListener {
                 val progress = (100 * it.bytesTransferred / it.totalByteCount).toDouble()
@@ -73,6 +74,8 @@ class AddFragment : Fragment() {
                         saveSnapshot(key,it.toString(),mBinding.etTitle.text.toString().trim())
                         mBinding.tilTitle.visibility = View.GONE
                         mBinding.tvMessage.text = getString(R.string.post_message_title)
+                        mBinding.btnSelect.visibility = View.VISIBLE
+                        mBinding.imgPhoto.setImageResource(android.R.color.transparent)
                     }
                 }.addOnFailureListener {
                     Snackbar.make(
@@ -80,6 +83,7 @@ class AddFragment : Fragment() {
                         Snackbar.LENGTH_SHORT
                     ).show()
                 }
+
     }
 
     private fun saveSnapshot(key: String, uri: String, title: String) {
