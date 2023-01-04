@@ -34,6 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/common_padding_default"
         android:layout_marginBottom="@dimen/common_padding_default"
+        android:paddingStart="@dimen/common_padding_default"
         android:button="@drawable/ic_thumb_up"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
                     AuthUI.getInstance().createSignInIntentBuilder()
                         .setIsSmartLockEnabled(false)
                         .setAvailableProviders(
-                        Arrays.asList(
+                        listOf(
                             AuthUI.IdpConfig.EmailBuilder().build(),
                             AuthUI.IdpConfig.GoogleBuilder().build()
                         )
@@ -109,7 +109,7 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
-        mBinding.bottomNav.setOnNavigationItemReselectedListener {
+        mBinding.bottomNav.setOnItemReselectedListener {
             when(it.itemId){
                 R.id.action_home -> (homeFragment as HomeAux).goToTop()
             }
