@@ -64,6 +64,11 @@ class HomeFragment : Fragment() {
                     with(holder) {
                         setListener(snapshot)
                         binding.tvTitle.text = snapshot.title
+                        binding.cbLike.text = snapshot.likeList.keys.size.toString()
+                        FirebaseAuth.getInstance().currentUser!!.let {
+
+                            binding.cbLike.isChecked = snapshot.likeList.containsKey(it.uid)
+                        }
                         Glide.with(mContext).load(snapshot.photoUrl).centerCrop().diskCacheStrategy(
                             DiskCacheStrategy.ALL
                         ).into(binding.imgPhoto)
